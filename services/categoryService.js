@@ -1,6 +1,7 @@
 const slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
 const Category = require("../models/categoryModel");
+const apiError = require("../utils/apiError");
 
 // @desc    Get all categories
 // @route   GET /api/v1/categories
@@ -16,11 +17,11 @@ exports.getCategories = asyncHandler(async (req, res) => {
 // @desc    Get a single category by ID
 // @route   GET /api/v1/categories/:id
 // @access  Public
-exports.getCategory = asyncHandler(async (req, res) => {
+exports.getCategory = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   const category = await Category.findById(id);
   if (!category) {
-    res.status(404).json({ msg: `No category for this ID: ${id}` });
+    return next(new apiError(`No category for this ID: ${id}`, 404));
   }
   res.status(200).json({ data: category });
 });
@@ -38,7 +39,7 @@ exports.createCategory = asyncHandler(async (req, res) => {
 // @desc    Update a category
 // @route   PUT /api/v1/categories/:id
 // @access  Private/Admin
-exports.updateCategory = asyncHandler(async (req, res) => {
+exports.updateCategory = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   const { name } = req.body;
 
@@ -48,7 +49,7 @@ exports.updateCategory = asyncHandler(async (req, res) => {
     { new: true },
   );
   if (!category) {
-    res.status(404).json({ msg: `No category for this ID: ${id}` });
+    return next(new apiError(`No category for this ID: ${id}`, 404));
   }
   res.status(200).json({ data: category });
 });
@@ -56,11 +57,11 @@ exports.updateCategory = asyncHandler(async (req, res) => {
 // @desc    Delete a category
 // @route   DELETE /api/v1/categories/:id
 // @access  Private/Admin
-exports.deleteCategory = asyncHandler(async (req, res) => {
+exports.deleteCategory = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   const category = await Category.findByIdAndDelete(id);
   if (!category) {
-    res.status(404).json({ msg: `No category for this ID: ${id}` });
+    return next(new apiError(`No category for this ID: ${id}`, 404));
   }
   res.status(204).send({});
 });

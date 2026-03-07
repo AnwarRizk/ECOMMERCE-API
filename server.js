@@ -4,9 +4,9 @@ const morgan = require("morgan");
 
 // Load environment variables
 dotenv.config({ path: "config.env", quiet: true });
+const apiError = require("./utils/apiError");
+const globalError = require("./middlewares/errorMiddleware");
 const dbConnection = require("./config/database");
-const CategoryModel = require("./models/categoryModel");
-const categoryService = require("./services/categoryService");
 const categoryRoute = require("./routes/categoryRoute");
 
 // Load database connection
@@ -24,16 +24,13 @@ if (process.env.NODE_ENV === "development") {
 // Mount Routes
 app.use("/api/v1/categories", categoryRoute);
 
+// Handle undefined routes
 app.all("*path", (req, res, next) => {
-  const err = new Error(`Can't find this route: ${req.originalUrl}`);
-
-  next(err.message);
+  next(new apiError(`Can't find this route: ${req.originalUrl}`, 400));
 });
 
-// Global error handling middleware
-app.use((err, req, res, next) => {
-  res.status(400).json({ err });
-});
+// Global error handling middleware (in express)
+app.use(globalError);
 
 // Routes
 app.get("/", (req, res) => {
@@ -41,6 +38,15 @@ app.get("/", (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+});
+
+// Handle unhandled promise rejections outside express
+process.on("unhandledRejection", (err) => {
+  console.error(`Unhandled Rejection: ${err.name} - ${err.message}`);
+  server.close(() => {
+    console.log("Shutting down...");
+    process.exit(1);
+  });
 });
