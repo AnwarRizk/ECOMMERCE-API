@@ -1,3 +1,4 @@
+/* eslint-disable new-cap */
 const express = require("express");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
@@ -8,6 +9,7 @@ const apiError = require("./utils/apiError");
 const globalError = require("./middlewares/errorMiddleware");
 const dbConnection = require("./config/database");
 const categoryRoute = require("./routes/categoryRoute");
+const subCategoryRoute = require("./routes/subcategoryRoute");
 
 // Load database connection
 dbConnection();
@@ -23,6 +25,7 @@ if (process.env.NODE_ENV === "development") {
 
 // Mount Routes
 app.use("/api/v1/categories", categoryRoute);
+app.use("/api/v1/subcategories", subCategoryRoute);
 
 // Handle undefined routes
 app.all("*path", (req, res, next) => {
