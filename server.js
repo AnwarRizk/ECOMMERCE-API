@@ -8,8 +8,10 @@ dotenv.config({ path: "config.env", quiet: true });
 const apiError = require("./utils/apiError");
 const globalError = require("./middlewares/errorMiddleware");
 const dbConnection = require("./config/database");
+// Route files
 const categoryRoute = require("./routes/categoryRoute");
 const subCategoryRoute = require("./routes/subcategoryRoute");
+const brandRoute = require("./routes/brandRoute");
 
 // Load database connection
 dbConnection();
@@ -26,6 +28,7 @@ if (process.env.NODE_ENV === "development") {
 // Mount Routes
 app.use("/api/v1/categories", categoryRoute);
 app.use("/api/v1/subcategories", subCategoryRoute);
+app.use("/api/v1/brands", brandRoute);
 
 // Handle undefined routes
 app.all("*path", (req, res, next) => {
