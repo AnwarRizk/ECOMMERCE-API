@@ -6,8 +6,6 @@ const {
   deleteCategoryValidator,
 } = require("../utils/validators/categoryValidator");
 
-const router = express.Router();
-
 const {
   getCategories,
   getCategory,
@@ -15,6 +13,13 @@ const {
   updateCategory,
   deleteCategory,
 } = require("../services/categoryService");
+
+const router = express.Router();
+
+const subcategoryRoute = require("./subcategoryRoute");
+
+// Nested route for subcategories under a specific category
+router.use("/:categoryId/subcategories", subcategoryRoute);
 
 router
   .route("/")

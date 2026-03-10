@@ -4,6 +4,22 @@ const asyncHandler = require("express-async-handler");
 const Subcategory = require("../models/subcategoryModel");
 const apiError = require("../utils/apiError");
 
+exports.setCategoryIdToBody = (req, res, next) => {
+  if (!req.body.category) {
+    req.body.category = req.params.categoryId;
+  }
+  next();
+};
+
+exports.createFilterObject = (req, res, next) => {
+  let filterObject = {};
+  if (req.params.categoryId) {
+    filterObject = { category: req.params.categoryId };
+  }
+  req.filterObject = filterObject;
+  next();
+};
+
 // @desc    Get all subcategories
 // @route   GET /api/v1/subcategories
 // @access  Public
@@ -11,7 +27,10 @@ exports.getSubcategories = asyncHandler(async (req, res) => {
   page = req.query.page || 1;
   limit = req.query.limit || 5;
   skip = (page - 1) * limit;
-  const subcategories = await Subcategory.find({}).skip(skip).limit(limit);
+
+  const subcategories = await Subcategory.find(req.filterObject)
+    .skip(skip)
+    .limit(limit);
   res
     .status(200)
     .json({ results: subcategories.length, page, data: subcategories });
