@@ -7,7 +7,6 @@ const productSchema = new mongoose.Schema(
       required: [true, "product title is required"],
       unique: [true, "product title must be unique"],
       minlength: [3, "product title must be at least 3 characters"],
-      maxlength: [32, "product title must be less than 32 characters"],
       trim: true,
     },
     slug: {
@@ -33,7 +32,7 @@ const productSchema = new mongoose.Schema(
       type: Number,
       required: [true, "product price is required"],
       trim: true,
-      //   maxlength: [10, "product price must be less than 10 characters"],
+      //   max: [10, "product price must be less than 10 characters"],
     },
     priceAfterDiscount: {
       type: Number,
