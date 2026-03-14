@@ -1,6 +1,7 @@
 const { check } = require("express-validator");
 const validatorMiddleware = require("../../middlewares/validatorMiddleware");
 const Category = require("../../models/categoryModel");
+const SubCategory = require("../../models/subcategoryModel");
 
 exports.getProductValidator = [
   check("id").isMongoId().withMessage("Invalid product ID format"),
@@ -71,11 +72,24 @@ exports.createProductValidator = [
   check("subcategories")
     .optional()
     .isArray()
-    .withMessage("Subcategories should be an array"),
-  check("subcategories")
-    .optional()
+    .withMessage("Subcategories should be an array")
     .isMongoId()
-    .withMessage("Invalid subcategory ID format"),
+    .withMessage("Invalid subcategory ID format")
+    .custom(async (subcategoryIds, { req }) => {
+      const subcategories = await SubCategory.find({
+        _id: { $exists: true, $in: subcategoryIds },
+      });
+      if (subcategories.length !== subcategoryIds.length) {
+        throw new Error("One or more subcategories not found");
+      }
+      // Ensure all subcategories belong to the same category
+      const CategoryId = req.body.category;
+      const CategoryIds = subcategories.map((sub) => sub.category.toString());
+      if (!CategoryIds.every((id) => id === CategoryId)) {
+        throw new Error("All subcategories must belong to the same category");
+      }
+      return true;
+    }),
   check("brand").optional().isMongoId().withMessage("Invalid brand ID format"),
   check("ratingsAverage")
     .optional()
