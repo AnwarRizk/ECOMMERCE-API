@@ -3,16 +3,25 @@ const slugify = require("slugify");
 const asyncHandler = require("express-async-handler");
 const Category = require("../models/categoryModel");
 const apiError = require("../utils/apiError");
+const ApiFeatures = require("../utils/apiFeatures");
 
 // @desc    Get all categories
 // @route   GET /api/v1/categories
 // @access  Public
 exports.getCategories = asyncHandler(async (req, res) => {
-  page = req.query.page || 1;
-  limit = req.query.limit || 5;
-  skip = (page - 1) * limit;
-  const categories = await Category.find({}).skip(skip).limit(limit);
-  res.status(200).json({ results: categories.length, page, data: categories });
+  const apiFeatures = new ApiFeatures(Category.find(), req.query, {
+    searchFields: ["name"],
+  })
+    .filter()
+    .sort()
+    .limitFields()
+    .search()
+    .paginate(5);
+
+  const categories = await apiFeatures.mongooseQuery;
+  res
+    .status(200)
+    .json({ results: categories.length, page: apiFeatures.page, data: categories });
 });
 
 // @desc    Get a single category by ID

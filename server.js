@@ -19,6 +19,9 @@ dbConnection();
 
 const app = express();
 
+// Use extended query parser to support nested query parameters
+app.set("query parser", "extended");
+
 // Middleware
 app.use(express.json());
 
