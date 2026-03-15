@@ -1,77 +1,31 @@
 /* eslint-disable new-cap */
-const slugify = require("slugify");
-const asyncHandler = require("express-async-handler");
 const Category = require("../models/categoryModel");
-const apiError = require("../utils/apiError");
-const ApiFeatures = require("../utils/apiFeatures");
+const factory = require("./handlersFactory");
 
 // @desc    Get all categories
 // @route   GET /api/v1/categories
 // @access  Public
-exports.getCategories = asyncHandler(async (req, res) => {
-  const apiFeatures = new ApiFeatures(Category.find(), req.query, {
-    searchFields: ["name"],
-  })
-    .filter()
-    .sort()
-    .limitFields()
-    .search()
-    .paginate(5);
-
-  const categories = await apiFeatures.mongooseQuery;
-  res
-    .status(200)
-    .json({ results: categories.length, page: apiFeatures.page, data: categories });
+exports.getCategories = factory.getAll(Category, {
+  searchFields: ["name"],
+  defaultLimit: 5,
 });
 
 // @desc    Get a single category by ID
 // @route   GET /api/v1/categories/:id
 // @access  Public
-exports.getCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const category = await Category.findById(id);
-  if (!category) {
-    return next(new apiError(`No category for this ID: ${id}`, 404));
-  }
-  res.status(200).json({ data: category });
-});
+exports.getCategory = factory.getOne(Category);
 
 // @desc    Create a new category
 // @route   POST /api/v1/categories
 // @access  Private/Admin
-exports.createCategory = asyncHandler(async (req, res) => {
-  const { name } = req.body;
-
-  const category = await Category.create({ name, slug: slugify(name) });
-  res.status(201).json({ data: category });
-});
+exports.createCategory = factory.createOne(Category);
 
 // @desc    Update a category
 // @route   PUT /api/v1/categories/:id
 // @access  Private/Admin
-exports.updateCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const { name } = req.body;
-
-  const category = await Category.findByIdAndUpdate(
-    id,
-    { name, slug: slugify(name) },
-    { new: true },
-  );
-  if (!category) {
-    return next(new apiError(`No category for this ID: ${id}`, 404));
-  }
-  res.status(200).json({ data: category });
-});
+exports.updateCategory = factory.updateOne(Category);
 
 // @desc    Delete a category
 // @route   DELETE /api/v1/categories/:id
 // @access  Private/Admin
-exports.deleteCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const category = await Category.findByIdAndDelete(id);
-  if (!category) {
-    return next(new apiError(`No category for this ID: ${id}`, 404));
-  }
-  res.status(204).send({});
-});
+exports.deleteCategory = factory.deleteOne(Category);
