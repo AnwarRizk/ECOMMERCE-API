@@ -5,18 +5,12 @@ const factory = require("./handlersFactory");
 // @desc    Get all products
 // @route   GET /api/v1/products
 // @access  Public
-exports.getProducts = factory.getAll(Product, {
-  populate: { path: "category", select: "name -_id" },
-  defaultLimit: 50,
-});
+exports.getProducts = factory.getAll(Product);
 
 // @desc    Get a single product by ID
 // @route   GET /api/v1/products/:id
 // @access  Public
-exports.getProduct = factory.getOne(Product, {
-  path: "category",
-  select: "name -_id",
-});
+exports.getProduct = factory.getOne(Product);
 
 // @desc    Create a new product
 // @route   POST /api/v1/products
