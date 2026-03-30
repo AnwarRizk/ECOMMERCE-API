@@ -1,6 +1,23 @@
-/* eslint-disable new-cap */
+const multer = require("multer");
+const { v4: uuidv4 } = require("uuid");
+
 const Category = require("../models/categoryModel");
 const factory = require("./handlersFactory");
+
+// 1) Disk storage configuration for multer
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/categories");
+  },
+  filename: (req, file, cb) => {
+    const ext = file.mimetype.split("/")[1];
+    cb(null, `category-${uuidv4()}-${Date.now()}.${ext}`);
+  },
+});
+
+const upload = multer({ storage: multerStorage });
+
+exports.uploadCategoryImage = upload.single("image");
 
 // @desc    Get all categories
 // @route   GET /api/v1/categories
