@@ -1,4 +1,4 @@
-/* eslint-disable new-cap */
+const path = require("path");
 const express = require("express");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
@@ -21,6 +21,9 @@ const app = express();
 
 // Use extended query parser to support nested query parameters
 app.set("query parser", "extended");
+
+// Serve static files from the uploads directory
+app.use(express.static(path.join(__dirname, "/uploads")));
 
 // Middleware
 app.use(express.json());
