@@ -1,4 +1,4 @@
-const express = require("express");
+const express = require('express');
 const {
   getSubcategories,
   getSubcategory,
@@ -7,24 +7,42 @@ const {
   deleteSubcategory,
   setCategoryIdToBody,
   createFilterObject,
-} = require("../services/subcategoryService");
+} = require('../services/subcategoryService');
 const {
   getSubcategoryValidator,
   createSubcategoryValidator,
   updateSubcategoryValidator,
   deleteSubcategoryValidator,
-} = require("../utils/validators/subcategoryValidator");
+} = require('../utils/validators/subcategoryValidator');
+
+const authService = require('../services/authService');
 
 const router = express.Router({ mergeParams: true }); // Merge params to access categoryId in nested routes
 
 router
-  .route("/")
+  .route('/')
   .get(createFilterObject, getSubcategories)
-  .post(setCategoryIdToBody, createSubcategoryValidator, createSubcategory);
+  .post(
+    authService.protect,
+    authService.allowedTo('admin', 'manager'),
+    setCategoryIdToBody,
+    createSubcategoryValidator,
+    createSubcategory,
+  );
 router
-  .route("/:id")
+  .route('/:id')
   .get(getSubcategoryValidator, getSubcategory)
-  .put(updateSubcategoryValidator, updateSubcategory)
-  .delete(deleteSubcategoryValidator, deleteSubcategory);
+  .put(
+    authService.protect,
+    authService.allowedTo('admin', 'manager'),
+    updateSubcategoryValidator,
+    updateSubcategory,
+  )
+  .delete(
+    authService.protect,
+    authService.allowedTo('admin'),
+    deleteSubcategoryValidator,
+    deleteSubcategory,
+  );
 
 module.exports = router;

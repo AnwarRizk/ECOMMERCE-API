@@ -1,12 +1,12 @@
-const { v4: uuidv4 } = require("uuid");
-const sharp = require("sharp");
-const asyncHandler = require("express-async-handler");
+const { v4: uuidv4 } = require('uuid');
+const sharp = require('sharp');
+const asyncHandler = require('express-async-handler');
 
-const Category = require("../models/categoryModel");
-const factory = require("./handlersFactory");
-const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
+const Category = require('../models/categoryModel');
+const factory = require('./handlersFactory');
+const { uploadSingleImage } = require('../middlewares/uploadImageMiddleware');
 
-exports.uploadCategoryImage = uploadSingleImage("image");
+exports.uploadCategoryImage = uploadSingleImage('image');
 
 exports.resizeImage = asyncHandler(async (req, res, next) => {
   if (!req.file) return next();
@@ -15,7 +15,7 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
 
   await sharp(req.file.buffer)
     .resize(600, 600)
-    .toFormat("jpeg")
+    .toFormat('jpeg')
     .jpeg({ quality: 90 })
     .toFile(`uploads/categories/${filename}`);
 
@@ -28,7 +28,7 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/categories
 // @access  Public
 exports.getCategories = factory.getAll(Category, {
-  searchFields: ["name"],
+  searchFields: ['name'],
   defaultLimit: 5,
 });
 
@@ -39,12 +39,12 @@ exports.getCategory = factory.getOne(Category);
 
 // @desc    Create a new category
 // @route   POST /api/v1/categories
-// @access  Private/Admin
+// @access  Private/Admin-Manager
 exports.createCategory = factory.createOne(Category);
 
 // @desc    Update a category
 // @route   PUT /api/v1/categories/:id
-// @access  Private/Admin
+// @access  Private/Admin-Manager
 exports.updateCategory = factory.updateOne(Category);
 
 // @desc    Delete a category
