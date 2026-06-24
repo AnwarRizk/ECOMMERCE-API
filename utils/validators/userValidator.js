@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const { check } = require('express-validator');
+const { check, body } = require('express-validator');
 const slugify = require('slugify');
 const validatorMiddleware = require('../../middlewares/validatorMiddleware');
 const User = require('../../models/userModel');
@@ -96,7 +96,7 @@ exports.updateUserValidator = [
 // - verify confirmation password matches the new password
 exports.changeUserPasswordValidator = [
   check('id').isMongoId().withMessage('Invalid user ID format'),
-  check('currentPassword')
+  body('currentPassword')
     .notEmpty()
     .withMessage('Current password is required')
     .custom(async (value, { req }) => {
@@ -111,12 +111,12 @@ exports.changeUserPasswordValidator = [
       }
       return true;
     }),
-  check('password')
+  body('password')
     .notEmpty()
     .withMessage('New password is required')
     .isLength({ min: 6 })
     .withMessage('Password must be at least 6 characters long'),
-  check('passwordConfirm')
+  body('passwordConfirm')
     .notEmpty()
     .withMessage('Password confirmation is required')
     .custom((value, { req }) => {

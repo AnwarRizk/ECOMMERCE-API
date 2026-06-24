@@ -25,6 +25,7 @@ const userSchema = new mongoose.Schema(
       required: [true, 'User password is required'],
       minlength: [6, 'Password must be at least 6 characters long'],
     },
+    passwordChangedAt: Date,
     role: {
       type: String,
       enum: ['user', 'admin'],
@@ -46,6 +47,10 @@ userSchema.pre('save', async function (next) {
   this.password = await bcrypt.hashSync(this.password, 12);
   next();
 });
+
+userSchema.methods.isPasswordCorrect = async function (password) {
+  return await bcrypt.compare(password, this.password);
+};
 
 const User = mongoose.model('User', userSchema);
 

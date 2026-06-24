@@ -1,11 +1,11 @@
-const express = require("express");
+const express = require('express');
 
 const {
   getCategoryValidator,
   createCategoryValidator,
   updateCategoryValidator,
   deleteCategoryValidator,
-} = require("../utils/validators/categoryValidator");
+} = require('../utils/validators/categoryValidator');
 
 const {
   getCategories,
@@ -15,26 +15,29 @@ const {
   deleteCategory,
   uploadCategoryImage,
   resizeImage,
-} = require("../services/categoryService");
+} = require('../services/categoryService');
 
 const router = express.Router();
 
-const subcategoryRoute = require("./subcategoryRoute");
+const subcategoryRoute = require('./subcategoryRoute');
+
+const authService = require('../services/authService');
 
 // Nested route for subcategories under a specific category
-router.use("/:categoryId/subcategories", subcategoryRoute);
+router.use('/:categoryId/subcategories', subcategoryRoute);
 
 router
-  .route("/")
+  .route('/')
   .get(getCategories)
   .post(
+    authService.protect,
     uploadCategoryImage,
     resizeImage,
     createCategoryValidator,
     createCategory,
   );
 router
-  .route("/:id")
+  .route('/:id')
   .get(getCategoryValidator, getCategory)
   .put(
     uploadCategoryImage,
